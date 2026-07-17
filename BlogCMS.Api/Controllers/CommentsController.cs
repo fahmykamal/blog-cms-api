@@ -36,7 +36,7 @@ public class CommentsController : ControllerBase
         }
         catch (KeyNotFoundException)
         {
-            return NotFound(new { message = "Post not found." });
+            return NotFound(new { error = "Post not found." });
         }
     }
 
@@ -45,7 +45,7 @@ public class CommentsController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _commentService.DeleteAsync(id);
-        if (!deleted) return NotFound();
+        if (!deleted) return NotFound(new { error = $"Comment with ID {id} not found." });
         return NoContent();
     }
 }

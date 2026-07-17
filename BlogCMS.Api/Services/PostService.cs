@@ -55,6 +55,9 @@ public class PostService : IPostService
         if (await _db.Posts.AnyAsync(p => p.Slug == slug))
             throw new InvalidOperationException("A post with this title already exists.");
 
+        if (!await _db.Categories.AnyAsync(c => c.Id == request.CategoryId))
+            throw new KeyNotFoundException($"Category with ID {request.CategoryId} not found.");
+
         var post = new Post
         {
             Title = request.Title,
@@ -88,6 +91,9 @@ public class PostService : IPostService
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (post is null) return null;
+
+        if (!await _db.Categories.AnyAsync(c => c.Id == request.CategoryId))
+            throw new KeyNotFoundException($"Category with ID {request.CategoryId} not found.");
 
         post.Title = request.Title;
         post.Content = request.Content;

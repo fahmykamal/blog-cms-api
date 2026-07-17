@@ -34,7 +34,7 @@ public class CategoriesController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(new { message = ex.Message });
+            return Conflict(new { error = ex.Message });
         }
     }
 
@@ -43,7 +43,7 @@ public class CategoriesController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _categoryService.DeleteAsync(id);
-        if (!deleted) return NotFound();
+        if (!deleted) return NotFound(new { error = $"Category with ID {id} not found." });
         return NoContent();
     }
 }

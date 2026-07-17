@@ -28,7 +28,7 @@ public class PostsController : ControllerBase
     public async Task<IActionResult> GetBySlug(string slug)
     {
         var post = await _postService.GetBySlugAsync(slug);
-        if (post is null) return NotFound();
+        if (post is null) return NotFound(new { error = $"Post with slug '{slug}' not found." });
         return Ok(post);
     }
 
@@ -44,7 +44,7 @@ public class PostsController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(new { message = ex.Message });
+            return Conflict(new { error = ex.Message });
         }
     }
 
@@ -53,7 +53,7 @@ public class PostsController : ControllerBase
     public async Task<IActionResult> Update(int id, PostRequest request)
     {
         var post = await _postService.UpdateAsync(id, request);
-        if (post is null) return NotFound();
+        if (post is null) return NotFound(new { error = $"Post with ID {id} not found." });
         return Ok(post);
     }
 
@@ -62,7 +62,7 @@ public class PostsController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _postService.DeleteAsync(id);
-        if (!deleted) return NotFound();
+        if (!deleted) return NotFound(new { error = $"Post with ID {id} not found." });
         return NoContent();
     }
 }

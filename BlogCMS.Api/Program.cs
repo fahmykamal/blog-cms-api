@@ -70,10 +70,23 @@ app.Use(async (ctx, next) =>
     {
         await next();
     }
-    catch
+    catch (Exception ex)
     {
         ctx.Response.Headers["Access-Control-Allow-Origin"] = "*";
-        throw;
+        ctx.Response.ContentType = "application/json; charset=utf-8";
+
+        if (ex is KeyNotFoundException)
+            ctx.Response.StatusCode = 404;
+        else if (ex is InvalidOperationException)
+            ctx.Response.StatusCode = 409;
+        else
+            ctx.Response.StatusCode = 500;
+
+        var msg = ex is KeyNotFoundException or InvalidOperationException
+            ? ex.Message
+            : "An unexpected error occurred. Please try again later.";
+
+        await ctx.Response.WriteAsJsonAsync(new { error = msg });
     }
 });
 

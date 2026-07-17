@@ -37,14 +37,6 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader());
-});
-
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
@@ -62,7 +54,29 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-app.UseCors();
+app.Use(async (ctx, next) =>
+{
+    ctx.Response.Headers["Access-Control-Allow-Origin"] = "*";
+    ctx.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
+    ctx.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
+
+    if (ctx.Request.Method == "OPTIONS")
+    {
+        ctx.Response.StatusCode = 204;
+        return;
+    }
+
+    try
+    {
+        await next();
+    }
+    catch
+    {
+        ctx.Response.Headers["Access-Control-Allow-Origin"] = "*";
+        throw;
+    }
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

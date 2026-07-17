@@ -19,6 +19,7 @@ Thumbs.db
 .DS_Store
 
 ## Secrets (if any)
+appsettings.json
 appsettings.Development.json
 
 ## Test files
